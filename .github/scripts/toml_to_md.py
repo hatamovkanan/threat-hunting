@@ -1,4 +1,7 @@
-import tomllib
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 import sys
 import re
 from pathlib import Path
@@ -127,7 +130,7 @@ def main():
         with open(md_path, "w", encoding="utf-8") as f:
             f.write(md_content)
 
-        print(f"  ✅ Generated: {md_path}")
+        print(f"  OK Generated: {md_path}")
 
 
 if __name__ == "__main__":

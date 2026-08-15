@@ -1,4 +1,7 @@
-import tomllib
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 import yaml
 from pathlib import Path
 
@@ -8,7 +11,7 @@ def generate_index_yml(yml_data: dict) -> None:
         yaml.dump(yml_data, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
 
     total = sum(len(v) for v in yml_data.values())
-    print(f"✅ index.yml generated ({total} hunts across {len(yml_data)} platforms)")
+    print(f"OK index.yml generated ({total} hunts across {len(yml_data)} platforms)")
 
 
 def generate_index_md(hunts_by_platform: dict) -> None:
@@ -35,7 +38,7 @@ def generate_index_md(hunts_by_platform: dict) -> None:
     with open("index.md", "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
-    print(f"✅ index.md generated")
+    print(f"OK index.md generated")
 
 
 def main():
@@ -53,13 +56,13 @@ def main():
             try:
                 data = tomllib.load(f)
             except Exception as e:
-                print(f"  ⚠️  Skipping {path}: {e}")
+                print(f"  WARNING Skipping {path}: {e}")
                 continue
 
         hunt = data.get("hunt", {})
         uuid = hunt.get("uuid", "")
         if not uuid:
-            print(f"  ⚠️  Skipping {path}: missing uuid")
+            print(f"  WARNING Skipping {path}: missing uuid")
             continue
 
         # Platform = top-level directory name
