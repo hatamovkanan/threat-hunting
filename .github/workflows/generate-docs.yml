@@ -1,4 +1,4 @@
-name: Generate Docs from TOML
+name: Generate Docs and Index
 
 on:
   push:
@@ -15,19 +15,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install pyyaml
+
       - name: Generate markdown docs
         run: python .github/scripts/toml_to_md.py
 
-      - name: Commit generated docs
+      - name: Generate index.yml and index.md
+        run: python .github/scripts/generate_index.py
+
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add '**/docs/*.md'
-          git diff --staged --quiet || git commit -m "docs: auto-generate markdown from TOML [skip ci]"
+          git add '**/docs/*.md' index.yml index.md
+          git diff --staged --quiet || git commit -m "docs: auto-generate docs and update index [skip ci]"
           git push
