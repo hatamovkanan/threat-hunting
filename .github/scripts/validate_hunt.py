@@ -1,4 +1,5 @@
 import tomllib
+import yaml
 import sys
 import re
 from pathlib import Path
@@ -10,12 +11,40 @@ URL_PATTERN = re.compile(r'^https?://.+')
 VALID_HUNT_TYPES = {"Hypothesis-Driven", "Analytics-Driven", "Intel-Driven"}
 VALID_LANGUAGES = {"ES|QL", "EQL", "KQL", "AQL", "SPL", "XQL", "CQL", "SQL"}
 
+
+def load_existing_uuids() -> dict:
+    """Load all existing UUIDs from index.yml. Returns {uuid: toml_path}."""
+    index_path = Path("index.yml")
+    if not index_path.exists():
+        return {}
+
+    with open(index_path, "r", encoding="utf-8") as f:
+        try:
+            index = yaml.safe_load(f)
+        except Exception:
+            return {}
+
+    existing = {}
+    if isinstance(index, dict):
+        for platform, hunts in index.items():
+            if isinstance(hunts, dict):
+                for uuid, hunt in hunts.items():
+                    existing[str(uuid)] = hunt.get("path", "unknown")
+    return existing
+
+
 errors = []
 toml_files = list(Path(".").rglob("queries/*.toml"))
 
 if not toml_files:
     print("No TOML files found.")
     sys.exit(0)
+
+# Load existing UUIDs from index.yml for duplicate check
+existing_uuids = load_existing_uuids()
+
+# Track UUIDs within the current PR to catch duplicates between new files
+seen_uuids = {}
 
 for path in toml_files:
     print(f"Validating: {path}")
@@ -33,9 +62,31 @@ for path in toml_files:
         if field not in hunt:
             errors.append(f"{path}: Missing required field '{field}'")
 
-    # UUID v4 format
-    if "uuid" in hunt and not UUID_PATTERN.match(hunt["uuid"]):
-        errors.append(f"{path}: 'uuid' is not a valid UUID v4")
+    # UUID v4 format + duplicate check
+    if "uuid" in hunt:
+        uuid = hunt["uuid"]
+
+        if not UUID_PATTERN.match(uuid):
+            errors.append(f"{path}: 'uuid' is not a valid UUID v4")
+        else:
+            toml_path_str = str(path).replace("\\", "/")
+
+            # Check duplicate against index.yml
+            if uuid in existing_uuids:
+                existing_path = existing_uuids[uuid]
+                # Allow if it's the same file (tuning an existing hunt)
+                if existing_path.lstrip("./") != toml_path_str.lstrip("./"):
+                    errors.append(
+                        f"{path}: Duplicate UUID '{uuid}' — already exists in index.yml at '{existing_path}'"
+                    )
+
+            # Check duplicate within this PR
+            if uuid in seen_uuids:
+                errors.append(
+                    f"{path}: Duplicate UUID '{uuid}' — also found in '{seen_uuids[uuid]}' within this PR"
+                )
+            else:
+                seen_uuids[uuid] = str(path)
 
     # MITRE technique format
     if "mitre" in hunt:

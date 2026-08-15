@@ -16,5 +16,8 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install pyyaml
+
       - name: Validate TOML files
         run: python .github/scripts/validate_hunt.py
