@@ -28,7 +28,7 @@ Review the `[hunt]` TOML table:
 - `description` should clearly explain the threat being hunted and the goal of the hunt. Suggest improvements if vague or inaccurate.
 - `uuid` must be a valid **UUID v4** format. It must be unique across all hunt files.
 - `integration` must reference a valid Elastic integration (e.g., `endpoint`, `aws`, `okta`).
-- `language` must be one of: `ES|QL`, `EQL`, `KQL`, `SQL`. Must match the actual query language used.
+- `language` must be one or more of: `ES|QL`, `EQL`, `KQL`, `AQL`, `SPL`, `XQL`, `CQL`, `SQL`. Must match the actual query language(s) used in the `query` field.
 - `hunt_type` must be one of:
   - `Hypothesis-Driven` — assumed breach with a specific hypothesis
   - `Analytics-Driven` — data-driven evidence collection requiring further analysis
@@ -100,6 +100,39 @@ Review the `[hunt]` TOML table:
 
 ---
 
+## <Query — SPL (Splunk) Specific>
+
+- Use field extractions early to reduce event volume.
+- Avoid broad `index=*` searches — scope to relevant indexes.
+- Use `stats`, `eval`, and `where` efficiently to filter and aggregate.
+- Verify `sourcetype` values match the actual data source.
+
+---
+
+## <Query — AQL (Ariel Query Language) Specific>
+
+- Scope queries to specific log sources using `FROM` and `WHERE` clauses.
+- Use appropriate time range filters to limit data scanned.
+- Verify referenced fields exist in the QRadar event schema.
+
+---
+
+## <Query — XQL (Cortex) Specific>
+
+- Use `filter` commands early in the pipeline to reduce data.
+- Verify dataset names match valid Cortex XDR datasets.
+- Prefer `comp` (compute) for aggregations over raw field access where applicable.
+
+---
+
+## <Query — CQL (Chronicle) Specific>
+
+- Validate UDM field references against the Chronicle schema.
+- Use `match` and `condition` blocks correctly in YARA-L rules.
+- Ensure `over` time window is appropriate for the detection context.
+
+---
+
 ## <Performance>
 
 - Avoid expensive regex on high-volume fields.
@@ -139,7 +172,7 @@ Each hunt must follow this structure:
 | `description` | ✅ | Clear threat + goal summary |
 | `uuid` | ✅ | Valid UUID v4, auto-generated |
 | `integration` | ✅ | Valid Elastic integration |
-| `language` | ✅ | `ES\|QL`, `EQL`, `KQL`, or `SQL` |
+| `language` | ✅ | `ES\|QL`, `EQL`, `KQL`, `AQL`, `SPL`, `XQL`, `CQL`, or `SQL` |
 | `hunt_type` | ✅ | `Hypothesis-Driven`, `Analytics-Driven`, or `Intel-Driven` |
 | `mitre` | ✅ | Valid ATT&CK technique IDs |
 | `query` | ✅ | Non-empty array of queries |
