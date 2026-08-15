@@ -1,3 +1,10 @@
+linux:
+  00461198-9a2d-4823-b4cc-f3d1b5c17935:
+    name: Hidden Process Execution
+    path: ./linux/queries/defense_evasion_via_hidden_process_execution.toml
+    mitre:
+    - T1036.004
+    - T1059
 windows:
   4f878255-53b8-4914-9a7d-4b668bd2ea6a:
     name: Low Occurrence Rate of CreateRemoteThread by Source Process

@@ -1,6 +1,10 @@
 # List of Available Queries
 
-Here are the queries currently available (1 total):
+Here are the queries currently available (2 total):
+
+## linux
+
+- [Hidden Process Execution](./linux/docs/defense_evasion_via_hidden_process_execution.md) (ES|QL)
 
 ## windows
 
