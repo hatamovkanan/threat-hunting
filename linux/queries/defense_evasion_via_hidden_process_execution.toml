@@ -7,7 +7,7 @@ integration = ["endpoint"]
 uuid = "00461198-9a2d-4823-b4cc-f3d1b5c17935"
 name = "Hidden Process Execution"
 language = ["ES|QL"]
-license = "Elastic License v2"
+hunt_type = "Hypothesis-Driven"
 notes = [
     "Included only hidden files, excluding hidden directories, as hidden directories are common in Unix.",
     "Included a process or parent process count of <= 3, and a host count of <= 3 to eliminate common processes across different hosts.",
