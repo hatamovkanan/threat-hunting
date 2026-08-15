@@ -34,6 +34,7 @@ def generate_md(toml_path: Path) -> str:
     uuid = hunt["uuid"]
     integrations = hunt.get("integration", [])
     languages = hunt.get("language", [])
+    hunt_type = hunt.get("hunt_type", "")
     notes = hunt.get("notes", [])
     mitre = hunt.get("mitre", [])
     queries = hunt.get("query", [])
@@ -63,6 +64,7 @@ def generate_md(toml_path: Path) -> str:
     lines.append(f"- **UUID:** `{uuid}`")
     lines.append(f"- **Integration:** {integration_str}")
     lines.append(f"- **Language:** `[{', '.join(languages)}]`")
+    lines.append(f"- **Hunt Type:** {hunt_type}")
     lines.append(f"- **Source File:** {source_link}")
     lines.append("")
 

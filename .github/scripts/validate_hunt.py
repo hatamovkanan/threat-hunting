@@ -3,10 +3,11 @@ import sys
 import re
 from pathlib import Path
 
-REQUIRED_FIELDS = ["author", "description", "integration", "uuid", "name", "language", "mitre", "query"]
+REQUIRED_FIELDS = ["author", "description", "integration", "uuid", "name", "language", "mitre", "query", "hunt_type"]
 MITRE_PATTERN = re.compile(r'^T\d{4}(\.\d{3})?$')
 UUID_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
 URL_PATTERN = re.compile(r'^https?://.+')
+VALID_HUNT_TYPES = {"Hypothesis-Driven", "Analytics-Driven", "Intel-Driven"}
 
 errors = []
 toml_files = list(Path(".").rglob("queries/*.toml"))
@@ -45,6 +46,11 @@ for path in toml_files:
     if "query" in hunt:
         if not hunt["query"] or all(q.strip() == "" for q in hunt["query"]):
             errors.append(f"{path}: 'query' field is empty")
+
+    # hunt_type must be one of the valid values
+    if "hunt_type" in hunt:
+        if hunt["hunt_type"] not in VALID_HUNT_TYPES:
+            errors.append(f"{path}: Invalid 'hunt_type' value '{hunt['hunt_type']}' — must be one of: {', '.join(sorted(VALID_HUNT_TYPES))}")
 
     # references must be valid URLs (optional field)
     if "references" in hunt:
