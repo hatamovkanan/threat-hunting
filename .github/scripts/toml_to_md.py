@@ -37,6 +37,7 @@ def generate_md(toml_path: Path) -> str:
     notes = hunt.get("notes", [])
     mitre = hunt.get("mitre", [])
     queries = hunt.get("query", [])
+    references = hunt.get("references", [])
 
     # Docs path relative to queries file
     toml_filename = toml_path.name
@@ -88,6 +89,14 @@ def generate_md(toml_path: Path) -> str:
         lines.append("")
         for technique in mitre:
             lines.append(mitre_link(technique))
+        lines.append("")
+
+    # References
+    if references:
+        lines.append("## References")
+        lines.append("")
+        for ref in references:
+            lines.append(f"- {ref}")
         lines.append("")
 
     return "\n".join(lines)

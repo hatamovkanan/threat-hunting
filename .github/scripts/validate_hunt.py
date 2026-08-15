@@ -6,6 +6,7 @@ from pathlib import Path
 REQUIRED_FIELDS = ["author", "description", "integration", "uuid", "name", "language", "mitre", "query"]
 MITRE_PATTERN = re.compile(r'^T\d{4}(\.\d{3})?$')
 UUID_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
+URL_PATTERN = re.compile(r'^https?://.+')
 
 errors = []
 toml_files = list(Path(".").rglob("queries/*.toml"))
@@ -44,6 +45,15 @@ for path in toml_files:
     if "query" in hunt:
         if not hunt["query"] or all(q.strip() == "" for q in hunt["query"]):
             errors.append(f"{path}: 'query' field is empty")
+
+    # references must be valid URLs (optional field)
+    if "references" in hunt:
+        if not isinstance(hunt["references"], list):
+            errors.append(f"{path}: 'references' must be an array")
+        else:
+            for ref in hunt["references"]:
+                if not URL_PATTERN.match(ref):
+                    errors.append(f"{path}: Invalid reference URL '{ref}' — must start with http:// or https://")
 
 if errors:
     print("\n❌ Validation failed:")
