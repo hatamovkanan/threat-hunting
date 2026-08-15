@@ -1,0 +1,6 @@
+windows:
+  4f878255-53b8-4914-9a7d-4b668bd2ea6a:
+    name: Low Occurrence Rate of CreateRemoteThread by Source Process
+    path: ./windows/queries/createremotethread_by_source_process_with_low_occurrence.toml
+    mitre:
+    - T1055
